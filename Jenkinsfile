@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', credentialsId: 'ADirin', url: 'https://github.com/ADirin/FarToCel_Fall2024.git'
+                git branch: 'master', credentialsId: 'ADirin', url: 'https://github.com/ADirin/TempConverter.git'
             }
         }
         stage('Build') {
