@@ -4,6 +4,9 @@ pipeline {
         PATH = "${env.PATH};C:\\Windows\\System32" // Update the PATH to include the directory of cmd.exe
         GIT_CREDENTIALS = credentials('amirdirin')
     }
+     tools {
+        maven 'M3'  // This tells Jenkins to auto-setup Maven in the PATH
+    }
     
     stages {
         stage('Checkout') {
