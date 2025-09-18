@@ -5,7 +5,7 @@ pipeline {
         GIT_CREDENTIALS = credentials('amirdirin')
     }
      tools {
-        maven 'M3'  // This tells Jenkins to auto-setup Maven in the PATH
+        maven 'Maven3'  // This tells Jenkins to auto-setup Maven in the PATH
     }
     
     stages {
