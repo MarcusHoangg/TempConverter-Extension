@@ -20,15 +20,19 @@ public class TempConverterTest {
 
     @Test
     void convertKel() {
-        double result = TempConverter.kelvintoCel(273);
-        assertEquals(-0.15, result, 0.01); // allow small margin of error
+        double result = TempConverter.kelvinToCelsius(273);
+        assertEquals(-0.15, result, 0.001);
     }
 
+    @Test
+    void convertKel2() {
+        double result = TempConverter.kelvinToCelsius(300);
+        assertEquals(26.85, result, 0.001);
+    }
 
     @Test
     void convertKeltoFarTest() {
         double result = TempConverter.kelvinToFah(300.1);
-        // Expected value depends on your formula; adjust if needed
-        assertEquals(80.33, result, 0.5);
+        assertEquals(80.51, result, 0.01);
     }
 }
