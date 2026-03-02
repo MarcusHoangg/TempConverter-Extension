@@ -53,8 +53,14 @@ pipeline {
 
         stage('Push Docker Image to Docker Hub') {
             steps {
-                bat 'docker login -u marcushoangg -p YOUR_PASSWORD'
-                bat 'docker push marcushoangg/tempconverter:latest'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    bat 'docker login -u %DOCKER_USER% -p %DOCKER_PASS%'
+                    bat 'docker push marcushoangg/tempconverter:latest'
+                }
             }
         }
     }
