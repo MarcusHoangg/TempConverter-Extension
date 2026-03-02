@@ -6,21 +6,29 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 git branch: 'master',
+                    credentialsId: 'github-pat',
                     url: 'https://github.com/MarcusHoangg/TempConverter-Extension.git'
             }
         }
 
-        stage('Build + Test + Coverage') {
+        stage('Build') {
             steps {
-                bat 'mvn -B clean test'
+                bat 'mvn clean package'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                bat 'mvn test'
             }
             post {
                 always {
-                    junit 'target/surefire-reports/TEST-*.xml'
-                    jacoco(execPattern: 'target/jacoco.exec')
+                    junit '**/target/surefire-reports/TEST-*.xml'
+                    jacoco execPattern: '**/target/jacoco.exec'
                 }
             }
         }
@@ -31,7 +39,7 @@ pipeline {
             }
         }
 
-        stage('Run Docker') {
+        stage('Run Docker Container') {
             steps {
                 bat 'docker run --rm tempconverter:latest'
             }
