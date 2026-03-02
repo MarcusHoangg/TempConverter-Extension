@@ -1,35 +1,39 @@
 pipeline {
     agent any
-    environment {
-        PATH = "${env.PATH};C:\\Windows\\System32" // Update the PATH to include the directory of cmd.exe
-        GIT_CREDENTIALS = credentials('amirdirin')
+
+    tools {
+        maven 'Maven3'
     }
-     tools {
-        maven 'Maven3'  // This tells Jenkins to auto-setup Maven in the PATH
-    }
-    
+
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', credentialsId: 'ADirin', url: 'https://github.com/ADirin/TempConverter.git'
+                git branch: 'master',
+                    url: 'https://github.com/MarcusHoangg/TempConverter-Extension.git'
             }
         }
-        stage('Build') {
-           steps {
-               bat 'mvn clean install'
-           }
-        }
-        stage('Test') {
-           steps{
-               bat 'mvn test'
-           }    
+
+        stage('Build + Test + Coverage') {
+            steps {
+                bat 'mvn -B clean test'
+            }
             post {
-                success {
-                    // Publish JUnit test results
-                    junit '**/target/surefire-reports/TEST-*.xml'
-                    // Generate JaCoCo code coverage report
-                    jacoco(execPattern: '**/target/jacoco.exec')
+                always {
+                    junit 'target/surefire-reports/TEST-*.xml'
+                    jacoco(execPattern: 'target/jacoco.exec')
                 }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                bat 'docker build -t tempconverter:latest .'
+            }
+        }
+
+        stage('Run Docker') {
+            steps {
+                bat 'docker run --rm tempconverter:latest'
             }
         }
     }
