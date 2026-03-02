@@ -1,21 +1,10 @@
-# Use an official Maven image as a parent image
-FROM maven:3.8.6-jdk-11
-
-# Set the working directory in the container
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn -q clean test package
 
-# Copy the pom.xml file to the container
-COPY pom.xml /app/
-
-# Copy the entire project to the container
-COPY . /app/
-
-# Package your application
-RUN mvn package
-
-# Run the main class (assuming your application has a main class)
-CMD ["java", "-jar", "target/interconversions.jar"]
-
-
-# to build: docker build -t javamvn .
-# To run: docker run --name javamvn1 javamvn
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /app/target/interconversions.jar app.jar
+ENTRYPOINT ["java","-jar","app.jar"]

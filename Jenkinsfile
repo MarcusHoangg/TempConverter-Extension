@@ -1,10 +1,13 @@
 pipeline {
     agent any
 
-    tools { maven 'Maven3' }
+    tools {
+        maven 'Maven3'
+    }
 
     stages {
-        stage('Checkout') {
+
+        stage('Checkout SCM') {
             steps {
                 git branch: 'master',
                     credentialsId: 'github-pat',
@@ -12,21 +15,46 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Check') {
             steps {
-                bat 'mvn -q clean package'
+                bat 'mvn --version'
             }
         }
 
-        stage('Test + JaCoCo') {
+        stage('Build') {
             steps {
-                bat 'mvn -q test jacoco:report'
+                bat 'mvn clean compile'
             }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                    jacoco execPattern: 'target/jacoco.exec'
-                }
+        }
+
+        stage('Test') {
+            steps {
+                bat 'mvn test'
+            }
+        }
+
+        stage('Publish Test Results') {
+            steps {
+                junit '**/target/surefire-reports/TEST-*.xml'
+            }
+        }
+
+        stage('Publish Coverage Report') {
+            steps {
+                jacoco execPattern: '**/target/jacoco.exec'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                bat 'docker build -t marcushoangg/tempconverter:latest .'
+            }
+        }
+
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                bat 'docker login -u marcushoangg -p YOUR_PASSWORD'
+                bat 'docker push marcushoangg/tempconverter:latest'
             }
         }
     }
